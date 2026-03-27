@@ -39,12 +39,33 @@
   <script>
     const token = "{{ session.get('token','') }}";
     const toast = document.getElementById("notification-toast");
+    const roomStatusPanel = document.getElementById("room-status-panel");
 
     function mostrarToast(titulo, mensaje) {
       if (!toast) return;
       toast.textContent = mensaje ? `${titulo}: ${mensaje}` : titulo;
       toast.classList.remove("oculto");
       setTimeout(() => toast.classList.add("oculto"), 4000);
+    }
+
+    function agregarActualizacionHabitacion(numeroHabitacion, nuevoEstado) {
+      if (!roomStatusPanel) return;
+      const labels = {
+        available: 'Disponible',
+        occupied: 'Ocupada',
+        cleaning: 'Limpieza',
+        maintenance: 'Mantenimiento'
+      };
+      const tarjeta = document.createElement("article");
+      tarjeta.className = "tarjeta-viva";
+      tarjeta.innerHTML = `
+        <strong>Habitación ${numeroHabitacion}</strong>
+        <p>Nuevo estado: ${labels[nuevoEstado] || nuevoEstado}</p>
+      `;
+      roomStatusPanel.prepend(tarjeta);
+      while (roomStatusPanel.children.length > 4) {
+        roomStatusPanel.removeChild(roomStatusPanel.lastElementChild);
+      }
     }
 
     if (token) {
@@ -55,6 +76,7 @@
           if (data.type === "room_status_update") {
             const labels = {available: 'Disponible', occupied: 'Ocupada', cleaning: 'Limpieza', maintenance: 'Mantenimiento'};
             mostrarToast("Habitación actualizada", `La habitación ${data.room_number} ahora está en ${labels[data.new_status] || data.new_status}.`);
+            agregarActualizacionHabitacion(data.room_number, data.new_status);
           } else {
             mostrarToast(data.title || "Notificación", data.message || "");
           }

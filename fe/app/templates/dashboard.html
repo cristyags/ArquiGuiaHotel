@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Tablero{% endblock %}
+{% block content %}
+<section class="encabezado-seccion">
+  <div>
+    <h1>Mis reservas</h1>
+    <p>Bienvenido, {{ session.get('username', '') }}</p>
+  </div>
+  <a class="boton-secundario" href="{{ url_for('new_reservation') }}">Nueva reserva</a>
+</section>
+
+<section class="tabla-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Reserva</th>
+        <th>Huésped</th>
+        <th>Habitación</th>
+        <th>Ingreso</th>
+        <th>Salida</th>
+        <th>Estado</th>
+        <th>Total</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reservation in reservations %}
+      <tr>
+        <td>#{{ reservation.id }}</td>
+        <td>{{ reservation.guest_id }}</td>
+        <td>{{ reservation.room_id }}</td>
+        <td>{{ reservation.check_in_date }}</td>
+        <td>{{ reservation.check_out_date }}</td>
+        <td><span class="badge" data-estado="{{ label_status(reservation.status) }}">{{ label_status(reservation.status) }}</span></td>
+        <td>${{ '%.2f'|format(reservation.total_amount) }}</td>
+        <td>
+          <div class="acciones">
+            <form method="post" action="{{ url_for('update_reservation_status', reservation_id=reservation.id) }}">
+              <input type="hidden" name="status" value="checked_in">
+              <button type="submit">Registrar ingreso</button>
+            </form>
+            <form method="post" action="{{ url_for('update_reservation_status', reservation_id=reservation.id) }}">
+              <input type="hidden" name="status" value="checked_out">
+              <button type="submit">Registrar salida</button>
+            </form>
+            <form method="post" action="{{ url_for('update_reservation_status', reservation_id=reservation.id) }}">
+              <input type="hidden" name="status" value="cancelled">
+              <button type="submit" class="peligro">Cancelar</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8">No hay reservas para mostrar.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

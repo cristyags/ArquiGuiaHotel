@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>Crear cuenta</h1>
+  <form method="post" class="formulario">
+    <label>Nombre completo
+      <input type="text" name="full_name">
+    </label>
+    <label>Usuario
+      <input type="text" name="username" required>
+    </label>
+    <label>Correo electrónico
+      <input type="email" name="email" required>
+    </label>
+    <label>Contraseña
+      <input type="password" name="password" required>
+    </label>
+    <button type="submit">Crear cuenta</button>
+  </form>
+  <p><a href="{{ url_for('login') }}">Volver al inicio de sesión</a></p>
+</section>
+{% endblock %}

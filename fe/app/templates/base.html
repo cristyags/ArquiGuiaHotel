@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Gestión hotelera{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">Gestión hotelera</div>
+    {% if session.get('token') %}
+    <nav class="nav">
+      <a href="{{ url_for('dashboard') }}">Tablero</a>
+      <a href="{{ url_for('rooms') }}">Habitaciones</a>
+      <a href="{{ url_for('guests') }}">Huéspedes</a>
+      <a href="{{ url_for('reservations') }}">Reservas</a>
+      <a href="{{ url_for('logout') }}">Salir</a>
+    </nav>
+    {% endif %}
+  </header>
+
+  <main class="contenedor">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <section class="mensajes">
+        {% for category, message in messages %}
+        <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    {% endwith %}
+
+    <div id="notification-toast" class="toast oculto"></div>
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    const token = "{{ session.get('token','') }}";
+    const toast = document.getElementById("notification-toast");
+
+    function mostrarToast(titulo, mensaje) {
+      if (!toast) return;
+      toast.textContent = mensaje ? `${titulo}: ${mensaje}` : titulo;
+      toast.classList.remove("oculto");
+      setTimeout(() => toast.classList.add("oculto"), 4000);
+    }
+
+    if (token) {
+      const socket = new WebSocket(`ws://localhost:8000/ws/notifications?token=${token}`);
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "room_status_update") {
+            const labels = {available: 'Disponible', occupied: 'Ocupada', cleaning: 'Limpieza', maintenance: 'Mantenimiento'};
+            mostrarToast("Habitación actualizada", `La habitación ${data.room_number} ahora está en ${labels[data.new_status] || data.new_status}.`);
+          } else {
+            mostrarToast(data.title || "Notificación", data.message || "");
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+    }
+  </script>
+</body>
+</html>

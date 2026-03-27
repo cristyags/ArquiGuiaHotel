@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: stayease
+      MYSQL_USER: stayuser
+      MYSQL_PASSWORD: staypass
+    ports:
+      - "3306:3306"
+    command: ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ustayuser", "-pstaypass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  be:
+    build: ./be
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mysql+pymysql://stayuser:staypass@db:3306/stayease?charset=utf8mb4
+      SECRET_KEY: supersecretkey_change_in_production
+      TOKEN_EXPIRE_MINUTES: 60
+    depends_on:
+      db:
+        condition: service_healthy
+
+  fe:
+    build: ./fe
+    ports:
+      - "5001:5000"
+    environment:
+      API_BASE_URL: http://be:8000
+    depends_on:
+      - be
+
+volumes:
+  db_data:

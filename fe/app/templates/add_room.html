@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Agregar habitación{% endblock %}
+{% block content %}
+<section class="form-card">
+  <h1>Nueva habitación</h1>
+  <form method="post" class="formulario">
+    <label>Número
+      <input type="number" name="room_number" min="1" step="1" inputmode="numeric" required>
+    </label>
+    <label>Tipo
+      <select name="room_type">
+        <option value="single">Sencilla</option>
+        <option value="double">Doble</option>
+        <option value="suite">Suite</option>
+        <option value="family">Familiar</option>
+      </select>
+    </label>
+    <label>Piso
+      <input type="number" name="floor" min="1" value="1" required>
+    </label>
+    <label>Precio por noche
+      <input type="number" step="0.01" min="0.01" name="price_per_night" required>
+    </label>
+    <label>Capacidad
+      <input type="number" min="1" name="capacity" value="1" required>
+    </label>
+    <label>Descripción
+      <textarea name="description"></textarea>
+    </label>
+    <label>Estado
+      <select name="status">
+        <option value="available">Disponible</option>
+        <option value="occupied">Ocupada</option>
+        <option value="cleaning">Limpieza</option>
+        <option value="maintenance">Mantenimiento</option>
+      </select>
+    </label>
+    <button type="submit">Guardar habitación</button>
+  </form>
+</section>
+{% endblock %}

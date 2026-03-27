@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Agregar huésped{% endblock %}
+{% block content %}
+<section class="form-card">
+  <h1>Nuevo huésped</h1>
+  <form method="post" class="formulario">
+    <label>Nombre completo
+      <input type="text" name="full_name" required>
+    </label>
+    <label>Correo electrónico
+      <input type="email" name="email" required>
+    </label>
+    <label>Teléfono
+      <input type="text" name="phone">
+    </label>
+    <label>Documento
+      <input type="text" name="document_id">
+    </label>
+    <button type="submit">Guardar huésped</button>
+  </form>
+</section>
+{% endblock %}

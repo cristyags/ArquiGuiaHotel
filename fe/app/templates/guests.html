@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Huéspedes{% endblock %}
+{% block content %}
+<section class="encabezado-seccion">
+  <div>
+    <h1>Huéspedes</h1>
+    <p>Administra perfiles de huéspedes.</p>
+  </div>
+  <a class="boton-secundario" href="{{ url_for('add_guest') }}">Agregar huésped</a>
+</section>
+
+<section class="tabla-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Documento</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for guest in guests %}
+      <tr>
+        <td>{{ guest.full_name }}</td>
+        <td>{{ guest.email }}</td>
+        <td>{{ guest.phone or 'Sin dato' }}</td>
+        <td>{{ guest.document_id or 'Sin dato' }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4">No hay huéspedes registrados.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Editar reserva{% endblock %}
+{% block content %}
+<section class="form-card">
+  <h1>Editar reserva #{{ reservation.id }}</h1>
+  <form method="post" class="formulario">
+    <label>Habitación
+      <select name="room_id" required>
+        {% for room in rooms %}
+        <option value="{{ room.id }}" {% if room.id == reservation.room_id %}selected{% endif %}>Habitación {{ room.room_number }} · {{ label_room_type(room.room_type) }} · ${{ '%.2f'|format(room.price_per_night) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Huésped
+      <select name="guest_id" required>
+        {% for guest in guests %}
+        <option value="{{ guest.id }}" {% if guest.id == reservation.guest_id %}selected{% endif %}>{{ guest.full_name }} · {{ guest.email }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Fecha de ingreso
+      <input type="date" name="check_in_date" value="{{ reservation.check_in_date }}" required>
+    </label>
+    <label>Fecha de salida
+      <input type="date" name="check_out_date" value="{{ reservation.check_out_date }}" required>
+    </label>
+    <label>Notas
+      <textarea name="notes">{{ reservation.notes or '' }}</textarea>
+    </label>
+    <button type="submit">Guardar cambios</button>
+  </form>
+</section>
+{% endblock %}

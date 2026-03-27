@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Habitaciones{% endblock %}
+{% block content %}
+<section class="encabezado-seccion">
+  <div>
+    <h1>Habitaciones</h1>
+    <p>Gestiona estados y disponibilidad.</p>
+  </div>
+  <a class="boton-secundario" href="{{ url_for('add_room') }}">Agregar habitación</a>
+</section>
+
+<section class="grid-habitaciones">
+  {% for room in rooms %}
+  <article class="habitacion-card">
+    <h3>Habitación {{ room.room_number }}</h3>
+    <p>Tipo: {{ label_room_type(room.room_type) }}</p>
+    <p>Piso: {{ room.floor }}</p>
+    <p>Precio: ${{ '%.2f'|format(room.price_per_night) }}</p>
+    <p>Capacidad: {{ room.capacity }}</p>
+    <p>{{ room.description or 'Sin descripción' }}</p>
+    <p class="estado-habitacion-inline">{{ label_status(room.status) }}</p>
+    <form method="post" action="{{ url_for('update_room_status', room_id=room.id) }}" class="fila-form">
+      <select name="status">
+        <option value="available">Disponible</option>
+        <option value="cleaning">Limpieza</option>
+        <option value="maintenance">Mantenimiento</option>
+        <option value="occupied">Ocupada</option>
+      </select>
+      <button type="submit">Actualizar</button>
+    </form>
+    <div class="acciones-card">
+      <a class="boton-accion" href="{{ url_for('edit_room', room_id=room.id) }}">Editar</a>
+      <form method="post" action="{{ url_for('delete_room', room_id=room.id) }}" onsubmit="return confirm('¿Deseas eliminar esta habitación?');">
+        <button type="submit" class="peligro">Eliminar</button>
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <p>No hay habitaciones registradas.</p>
+  {% endfor %}
+</section>
+{% endblock %}

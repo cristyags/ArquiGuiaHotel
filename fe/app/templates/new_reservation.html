@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Nueva reserva{% endblock %}
+{% block content %}
+<section class="form-card">
+  <h1>Nueva reserva</h1>
+  <form method="post" class="formulario">
+    <label>Habitación
+      <select name="room_id" required>
+        <option value="">Selecciona una habitación</option>
+        {% for room in rooms %}
+        <option value="{{ room.id }}">Habitación {{ room.room_number }} · {{ label_room_type(room.room_type) }} · ${{ '%.2f'|format(room.price_per_night) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Huésped
+      <select name="guest_id" required>
+        <option value="">Selecciona un huésped</option>
+        {% for guest in guests %}
+        <option value="{{ guest.id }}">{{ guest.full_name }} · {{ guest.email }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Fecha de ingreso
+      <input type="date" name="check_in_date" required>
+    </label>
+    <label>Fecha de salida
+      <input type="date" name="check_out_date" required>
+    </label>
+    <label>Notas
+      <textarea name="notes"></textarea>
+    </label>
+    <button type="submit">Crear reserva</button>
+  </form>
+</section>
+{% endblock %}

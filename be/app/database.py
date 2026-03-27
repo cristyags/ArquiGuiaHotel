@@ -16,7 +16,7 @@ def normalize_database_url(url: str) -> str:
 engine = create_engine(
     normalize_database_url(settings.database_url),
     pool_pre_ping=True,
-    connect_args={"charset": "utf8mb4"},
+    connect_args={"charset": "utf8mb4", "init_command": "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"},
 )
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 

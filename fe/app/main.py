@@ -45,26 +45,54 @@ def login_required():
     return "token" in session
 
 
+MOJIBAKE_MARKERS = ("Ã", "Â", "â", "ð", "Ð", "�")
+
+
 def prepare_response(response):
     response.encoding = "utf-8"
     return response
 
 
+def looks_like_mojibake(value):
+    return isinstance(value, str) and any(marker in value for marker in MOJIBAKE_MARKERS)
+
+
+def repair_text(value):
+    if not looks_like_mojibake(value):
+        return value
+    try:
+        repaired = value.encode("latin1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return value
+    return repaired if repaired and "�" not in repaired else value
+
+
+def repair_payload(value):
+    if isinstance(value, dict):
+        return {key: repair_payload(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [repair_payload(item) for item in value]
+    if isinstance(value, str):
+        return repair_text(value)
+    return value
+
+
 def api_detail(response):
     response = prepare_response(response)
     try:
-        data = response.json()
+        data = repair_payload(response.json())
         if isinstance(data, dict):
-            return data.get("detail") or data.get("message") or "Ocurrió un error"
+            detail = data.get("detail") or data.get("message") or "Ocurrió un error"
+            return repair_text(detail)
         return "Ocurrió un error"
     except Exception:
-        return response.text.strip() or "Ocurrió un error inesperado"
+        return repair_text(response.text.strip()) or "Ocurrió un error inesperado"
 
 
 def parse_json(response, default=None):
     response = prepare_response(response)
     try:
-        return response.json()
+        return repair_payload(response.json())
     except Exception:
         return default
 
